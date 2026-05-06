@@ -174,7 +174,9 @@
         # api batch requests are limited to 20 requests
         $chunkSize = 20
         # base graph api uri
-        $uri = "https://graph.microsoft.com"
+        $mgContext = Get-MgContext
+        $mgEnvironment = Get-MgEnvironment | Where-Object Name -eq $mgContext.Environment 
+        $uri = $mgEnvironment.GraphEndpoint
         # batch uri
         $requestUri = "$uri/$graphVersion/`$batch"
         # buffer to hold chunks of requests
@@ -329,7 +331,7 @@
                                 Write-Verbose "Batch result for request '$($response.Id)' is paginated. Nextlink will be processed in the next batch"
                             }
 
-                            $relativeNextLink = $response.body.'@odata.nextLink' -replace [regex]::Escape("https://graph.microsoft.com/$graphVersion/")
+                            $relativeNextLink = $response.body.'@odata.nextLink' -replace [regex]::Escape("$uri/$graphVersion/")
                             # make a request object copy, so I can modify it without interfering with the original object
                             $nextLinkRequest = $requestChunk | ? Id -EQ $response.Id | ConvertTo-Json -Depth 10 | ConvertFrom-Json
                             # replace original URL with the nextLink
@@ -450,8 +452,8 @@
     process {
         # check url validity
         $batchRequest.URL | % {
-            if ($_ -like "http*" -or $_ -like "*/beta/*" -or $_ -like "*/v1.0/*" -or $_ -like "*/graph.microsoft.com/*") {
-                Write-Warning "url '$_' has to be relative (without the whole 'https://graph.microsoft.com/<apiversion>' part)!"
+            if ($_ -like "http*" -or $_ -like "*/beta/*" -or $_ -like "*/v1.0/*" -or $_ -like "*/graph.microsoft.(com|us)/*") {
+                Write-Warning "url '$_' has to be relative (without the whole 'https://graph.microsoft.(com|us)/<apiversion>' part)!"
                 return
             }
         }

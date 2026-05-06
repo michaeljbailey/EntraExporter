@@ -25,7 +25,7 @@
     By default GET.
 
     .PARAMETER url
-    Request URL in relative form like "/deviceManagement/managedDevices/38027eb9-1f3e-49ea-bf91-f7b7f07c3a63" a.k.a. without the "https://graph.microsoft.com/<apiVersion>" prefix (API version is specified when the batch is invoked).
+    Request URL in relative form like "/deviceManagement/managedDevices/38027eb9-1f3e-49ea-bf91-f7b7f07c3a63" a.k.a. without the "https://graph.microsoft.(com|us)/<apiVersion>" prefix (API version is specified when the batch is invoked).
 
     When the 'placeholder' parameter is specified, for each value it contains, new request url will be generated with such value used instead of the '<placeholder>' string.
 
@@ -213,8 +213,8 @@
         # fix common mistake where there are multiple following slashes
         $_ = $_ -replace "(?<!^https:)/{2,}", "/"
 
-        if ($_ -like "http*" -or $_ -like "*/beta/*" -or $_ -like "*/v1.0/*" -or $_ -like "*/graph.microsoft.com/*") {
-            Write-Warning "url '$_' has to be in the relative form (without the whole 'https://graph.microsoft.com/<apiversion>' part)!"
+        if ($_ -like "http*" -or $_ -like "*/beta/*" -or $_ -like "*/v1.0/*" -or $_ -like "*/graph.microsoft.(com|us)/*") {
+            Write-Warning "url '$_' has to be in the relative form (without the whole 'https://graph.microsoft.(com|us)/<apiversion>' part)!"
             return
         }
 
